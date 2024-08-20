@@ -1,0 +1,7 @@
+# Virtual Environments
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+models/yolov3.weights
