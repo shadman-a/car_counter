@@ -1,20 +1,21 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, jsonify
 import cv2
-from vision import process_frame  # Import the vision functions
+from vision import process_frame
 
 app = Flask(__name__)
 
-# Initialize the webcam
 cap = cv2.VideoCapture(1)
+current_counts = {'car': 0, 'person': 0, 'bicycle': 0, 'bus': 0, 'truck': 0}
 
 def generate_frames():
+    global current_counts
     while True:
         success, frame = cap.read()
         if not success:
             break
         else:
-            frame, car_count = process_frame(frame)  # Process the frame using the vision module
-            cv2.putText(frame, f'Car Count: {car_count}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
+            frame, counts = process_frame(frame)  # Process the frame using the vision module
+            current_counts = counts  # Update global count state
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
 
@@ -28,6 +29,10 @@ def index():
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/counts')
+def counts():
+    return jsonify(current_counts)
 
 if __name__ == "__main__":
     app.run(debug=True)

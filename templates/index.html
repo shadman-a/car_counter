@@ -4,9 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Counter</title>
+    <style>
+        .counter {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Real-Time Car Counter</h1>
+    <h1>Feed</h1>
     <img src="{{ url_for('video_feed') }}" width="800" />
+    
+    <div class="counter">
+        <p>Cars: <span id="car-count">0</span></p>
+        <p>People: <span id="person-count">0</span></p>
+        <p>Bicycles: <span id="bicycle-count">0</span></p>
+        <p>Buses: <span id="bus-count">0</span></p>
+        <p>Trucks: <span id="truck-count">0</span></p>
+    </div>
+
+    <script>
+        function updateCounts() {
+            fetch('/counts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('car-count').textContent = data.car;
+                    document.getElementById('person-count').textContent = data.person;
+                    document.getElementById('bicycle-count').textContent = data.bicycle;
+                    document.getElementById('bus-count').textContent = data.bus;
+                    document.getElementById('truck-count').textContent = data.truck;
+                });
+        }
+
+        setInterval(updateCounts, 1000);  // Update counts every second
+    </script>
 </body>
 </html>
